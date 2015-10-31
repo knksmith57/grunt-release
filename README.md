@@ -140,6 +140,8 @@ The following are all the release steps, you can disable any you need to:
 ```js
   release: {
     options: {
+      noVerify: true, // pass --no-verify to git commands
+      silent: false, // default: true. Prevents text from being logged to console
       bump: false, //default: true
       changelog: true, //default: false
       changelogText: '<%= version %>\n', //default: '### <%= version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n'

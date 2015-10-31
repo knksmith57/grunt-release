@@ -65,6 +65,8 @@ module.exports = function(grunt){
 
     // Defaults
     var options = grunt.util._.extend({
+      noVerify: false,
+      silent: true,
       bump: true,
       changelog: false, // Update changelog file
 
@@ -139,7 +141,7 @@ module.exports = function(grunt){
         deferred.resolve();
       }
       else {
-        var success = shell.exec(cmd, {silent:true}).code === 0;
+        var success = shell.exec(cmd, {silent: options.silent}).code === 0;
 
         if (success){
           grunt.log.ok(msg || cmd);
@@ -151,6 +153,10 @@ module.exports = function(grunt){
         }
       }
       return deferred.promise;
+    }
+
+    function noVerify(){
+      return options.noVerify ? ' --no-verify' : '';
     }
 
     function changelog(){
@@ -183,10 +189,9 @@ module.exports = function(grunt){
       }
 
       var message = commitMessage.map(function(el) {
-        return '-m "' + grunt.template.process(el, templateOptions) + '"';
+        return ' -m "' + grunt.template.process(el, templateOptions) + '"';
       }).join(' ');
-
-      return run('git commit ' + message, 'Committed all files');
+      return run('git commit' + noVerify() + message, 'Committed all files');
     }
 
     function tag(){
@@ -194,11 +199,11 @@ module.exports = function(grunt){
     }
 
     function push(){
-      run('git push ' + options.remote + ' HEAD', 'pushed to remote');
+      run('git push ' + options.remote + ' HEAD' + noVerify(), 'pushed to remote');
     }
 
     function pushTags(){
-      run('git push ' + options.remote + ' ' + tagName, 'pushed new tag '+ config.newVersion +' to remote');
+      run('git push ' + options.remote + ' ' + tagName + noVerify(), 'pushed new tag '+ config.newVersion +' to remote');
     }
 
     function publish(){
