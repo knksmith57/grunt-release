@@ -142,6 +142,7 @@ The following are all the release steps, you can disable any you need to:
     options: {
       bump: false, //default: true
       changelog: true, //default: false
+      changes: false, // default: false. If true, a file in your repo root named changes.md will be read in and added after the changelog text. The file will also be cleared and committed as part of the release so that is is empty for the next release.
       changelogText: '<%= version %>\n', //default: '### <%= version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n'
       file: 'component.json', //default: package.json
       add: false, //default: true

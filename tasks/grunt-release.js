@@ -54,6 +54,10 @@ module.exports = function(grunt){
       }
 
       var filesToStage = options.filesToStage;
+      if(options.changes) {
+        filesToStage.push('changes.md');
+      }
+
       return {
         files: options.additionalFiles,
         filesToStage: filesToStage,
@@ -66,10 +70,14 @@ module.exports = function(grunt){
     // Defaults
     var options = grunt.util._.extend({
       bump: true,
+      changes: false,
       changelog: false, // Update changelog file
 
       // Text which is inserted into change log
-      changelogText: '### <%= version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n',
+      changelogText: [
+        '# v<%= version %>',
+        '**<%= grunt.template.today("yyyy-mm-dd") %>**'
+      ].join('\n'),
 
       // file is in charge of master information, ie, it is it which define the base version to work on
       file: grunt.config('pkgFile') || 'package.json',
@@ -99,8 +107,8 @@ module.exports = function(grunt){
         version: config.newVersion
       }
     };
-    var tagName = grunt.template.process(grunt.config.getRaw(this.name + '.options.tagName') || '<%= version %>', templateOptions);
-    var commitMessage = grunt.template.process(grunt.config.getRaw(this.name + '.options.commitMessage') || 'release <%= version %>', templateOptions);
+    var tagName = grunt.template.process(grunt.config.getRaw(this.name + '.options.tagName') || 'v<%= version %>', templateOptions);
+    var commitMessage = grunt.template.process(grunt.config.getRaw(this.name + '.options.commitMessage') || '-- v<%= version %> RELEASE --', templateOptions);
     var tagMessage = grunt.template.process(grunt.config.getRaw(this.name + '.options.tagMessage') || 'version <%= version %>', templateOptions);
 
     var nowrite = grunt.option('no-write');
@@ -153,6 +161,16 @@ module.exports = function(grunt){
       return deferred.promise;
     }
 
+    function changes(text) {
+      var clPath = 'changes.md';
+      if(!options.changes || !grunt.file.exists( clPath )) return '';
+      if ( text && !grunt.option( 'no-write' ) ) {
+        grunt.file.write( clPath, text );
+      } else {
+        return '\n\n' + grunt.file.read( clPath ) + '\n\n';
+      }
+    }
+
     function changelog(){
       var filename = options.changelog;
 
@@ -165,7 +183,8 @@ module.exports = function(grunt){
 
       return Q.fcall(function () {
         var changelogText = grunt.template.process(options.changelogText, templateOptions);
-        var changelogContent = changelogText + grunt.file.read(filename);
+        var changelogContent = changelogText + changes() + grunt.file.read(filename);
+        changes('\n');
 
         grunt.file.write(filename, changelogContent);
         grunt.log.ok('Changelog ' + filename + ' updated');
