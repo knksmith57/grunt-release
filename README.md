@@ -160,6 +160,7 @@ The following are all the release steps, you can disable any you need to:
       afterBump: [], // optional grunt tasks to run after file versions are bumped
       beforeRelease: [], // optional grunt tasks to run after release version is bumped up but before release is packaged
       afterRelease: [], // optional grunt tasks to run after release is packaged
+      filesToStage: [], // optional additional files to stage as part of the release commit. This may be useful if the tasks specified in afterBump modify the local filesystem.
       updateVars: [], // optional grunt config objects to update (this will update/set the version property on the object specified)
       github: {
         apiRoot: 'https://git.example.com/v3', // Default: https://github.com
