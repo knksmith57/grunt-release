@@ -53,8 +53,10 @@ module.exports = function(grunt){
         options.github.apiRoot = 'https://api.github.com'; // Default Github.com api
       }
 
+      var filesToStage = options.filesToStage;
       return {
         files: options.additionalFiles,
+        filesToStage: filesToStage,
         vars: options.updateVars,
         newVersion: newVersion,
         pkg: pkg
@@ -86,7 +88,8 @@ module.exports = function(grunt){
       beforeReleaseTasks: [],
       afterReleaseTasks: [],
       beforeBumpTasks: [],
-      afterBumpTasks: []
+      afterBumpTasks: [],
+      filesToStage: []
     }, (grunt.config.data[this.name] || {}).options);
     var config = setup(options.file, type);
 
@@ -170,7 +173,7 @@ module.exports = function(grunt){
     }
 
     function add(){
-      var files = config.files.join(' ');
+      var files = config.files.concat(config.filesToStage).join(' ');
       return run('git add ' + files, ' staged ' + files);
     }
 
