@@ -301,9 +301,11 @@ module.exports = function(grunt){
           if (tasks.length) {
             grunt.log.ok('running ' + taskName + ' ');
             if (!nowrite) {
+              var promisedTasks = new Array(tasks.length);
               for (var i = 0; i < tasks.length; i++) {
-                run('grunt ' + tasks[i], '-> ' + tasks[i]);
+                promisedTasks[i] = run('grunt ' + tasks[i], '-> ' + tasks[i]);
               }
+              return Q.all(promisedTasks);
             }
           }
         });
